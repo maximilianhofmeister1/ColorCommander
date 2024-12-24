@@ -10,12 +10,9 @@ public class Main {
 
     public static void main(String[] args) {
         //game variables
-        int time = 0;
-        int speed = 1;
-        char[] pickerLetters = {'A', 'B', 'C', 'D'};
-        char[] pipeLetters = {'E', 'F', 'G', 'H'};
+        GameStats game = new GameStats();
 
-        buildGameInterface(speed, time, pickerLetters, pipeLetters);
+        buildGameInterface(game.speed, game.time, game.pickerLetters, game.pipeLetters);
     }
 
     private static void buildGameInterface(double currentSpeed, int time, char[] pickerLetters, char[] pipeLetters) {
@@ -50,7 +47,7 @@ public class Main {
         }
 
         //Pipes
-        double pipeHeight = (window.getHeight() - marginY) - (marginY + (2 * colWidth));
+        double pipeHeight = gameHeight - (2 * colWidth);
         for (int i = 0; i < 4; i++) {
             window.setColor(Palette.BLACK);
             window.drawRectangle(
