@@ -8,37 +8,32 @@ public class Main {
     static CodeDraw window = new CodeDraw(1000, 600);
     static double marginX = (int) (window.getWidth() * 0.2);
     static double marginY = (int) (window.getHeight() * 0.1);
+
+    static int timeCount = 0;
+    static int shuffleLettersCount = 0;
+    static boolean gameOver = false;
+    static boolean gameOverScreen = false;
+
     static GameStats game = new GameStats();
     static FillColor[] colorPickers = new FillColor[4];
     static Pipe[] pipes = new Pipe[4];
 
 
     public static void main(String[] args) {
-        //Init Arrays
-        for (int i = 0; i < colorPickers.length; i++) {
-            colorPickers[i] = new FillColor();
-            colorPickers[i].color = FillColor.getDefaultColors()[i];
-            colorPickers[i].letter = game.pickerLetters[i];
-        }
-        for (int i = 0; i < pipes.length; i++) {
-            FillColor[] fillLevels = generateRandomFillColorArray();
-            pipes[i] = new Pipe(game.pipeLetters[i], fillLevels);
-        }
-
+        restart();
         buildGameInterface(game.speed, game.time);
+
         char[] keysPressed = new char[2];
 
         while (!window.isClosed()) {
             for (var e : window.getEventScanner()) {
                 switch (e) {
                     case KeyDownEvent a -> {
-                        if(a.getKey() == Key.SPACE){
+                        if (a.getKey() == Key.SPACE) {
                             keysPressed = new char[2];
-                        }
-                        else if(keysPressed[0]=='\u0000'){
+                        } else if (keysPressed[0] == '\u0000') {
                             keysPressed[0] = Character.toUpperCase(a.getChar());
-                        }
-                        else{
+                        } else {
                             keysPressed[1] = Character.toUpperCase(a.getChar());
                             fillUp(keysPressed);
                             keysPressed = new char[2];
@@ -51,10 +46,38 @@ public class Main {
                     }
                 }
             }
-            buildGameInterface(game.speed, game.time);
+
+            if(!gameOver) {
+                //Time
+                if (++timeCount >= 25) {
+                    game.time++;
+                    timeCount = 0;
+
+                    //adjust speed
+                    if (game.time % 30 == 0 && game.speed < 5) {
+                        game.speed += 0.25;
+                    }
+                }
+
+                //adjust fill levels
+                for (Pipe pipe : pipes) {
+                    for (FillColor fillLevel : pipe.fillLevels) {
+                        if (fillLevel.fillLevel - game.speed / 20 > 0) {
+                            fillLevel.fillLevel -= game.speed / 20;
+                        } else {
+                            gameOver = true;
+                            break;
+                        }
+                    }
+                }
+
+                //is called 25 times per second
+                buildGameInterface(game.speed, game.time);
+            }
+            else if(gameOver && !gameOverScreen){
+                gameOver();
+            }
         }
-
-
     }
 
     private static void buildGameInterface(double currentSpeed, int time) {
@@ -106,14 +129,14 @@ public class Main {
                     "" + pipes[i].letter
             );
 
-            //Pipe Fills
+            //Pipe Fill Levels
             for (int fillCount = 0; fillCount < pipes[i].fillLevels.length; fillCount++) {
                 FillColor currentFillLevel = pipes[i].fillLevels[fillCount];
                 double fillWidth = colWidth / pipes[i].fillLevels.length;
                 double fillHeight = pipeHeight / 100 * currentFillLevel.fillLevel;
                 Point2D fillsXYCoordinate = new Point2D(
                         (colWidth * 1.5 * i) + marginX + (fillWidth * fillCount),
-                        marginY + (2* colWidth) + pipeHeight
+                        marginY + (2 * colWidth) + pipeHeight
                 );
                 window.setColor(currentFillLevel.color);
                 window.fillRectangle(fillsXYCoordinate.getX(), fillsXYCoordinate.getY() - fillHeight, fillWidth, fillHeight);
@@ -123,7 +146,7 @@ public class Main {
         window.show(40);
     }
 
-    private static void fillUp(char[] keysPressed){
+    private static void fillUp(char[] keysPressed) {
         Color c = null;
         for (FillColor colorPicker : colorPickers) {
             if (keysPressed[0] == colorPicker.letter) {
@@ -131,23 +154,52 @@ public class Main {
                 break;
             }
         }
-        for(Pipe pipe : pipes){
-            if(keysPressed[1] == pipe.letter){
-                for(FillColor fc : pipe.fillLevels){
-                    if(c == fc.color){
+        for (Pipe pipe : pipes) {
+            if (keysPressed[1] == pipe.letter) {
+                for (FillColor fc : pipe.fillLevels) {
+                    if (c == fc.color) {
                         fc.fillLevel = 100;
                         break;
                     }
                 }
             }
         }
+
+        //Shuffle Letters if needed and reset counter
+        if (game.shuffleLetters) {
+            if (++shuffleLettersCount >= game.shuffleLettersWhenCount) {
+                shuffleLetters(pipes);
+                shuffleLetters(colorPickers);
+                shuffleLettersCount = 0;
+                game.shuffleLettersWhenCount = new Random().nextInt(2, 8);
+            }
+        }
     }
 
-    private static FillColor[] generateRandomFillColorArray(){
+    //TODO: Shuffle Letters im ganzen Alphabet
+    private static void shuffleLetters(Pipe[] pipes) {
+        for (int j = pipes.length - 1; j > 0; j--) {
+            int index = new Random().nextInt(j + 1);
+            char a = pipes[index].letter;
+            pipes[index].letter = pipes[j].letter;
+            pipes[j].letter = a;
+        }
+    }
+
+    private static void shuffleLetters(FillColor[] colors) {
+        for (int j = colors.length - 1; j > 0; j--) {
+            int index = new Random().nextInt(j + 1);
+            char a = colors[index].letter;
+            colors[index].letter = colors[j].letter;
+            colors[j].letter = a;
+        }
+    }
+
+    private static FillColor[] generateRandomFillColorArray() {
         Color[] colors = FillColor.getDefaultColors().clone();
         FillColor[] array = new FillColor[colors.length];
         //Shuffle colors Array
-        for (int j = colors.length - 1; j > 0; j--){
+        for (int j = colors.length - 1; j > 0; j--) {
             int index = new Random().nextInt(j + 1);
             // Simple swap
             Color a = colors[index];
@@ -172,9 +224,27 @@ public class Main {
         }
     }
 
+    private static void gameOver() {
+        gameOverScreen = true;
+        System.out.println("Game Over");
+        game.saveToFile("./GameLog.txt");
+    }
+
     private static void restart() {
-        //TODO: Save Game-Stats as log to File
         game = new GameStats();
+        gameOver = false;
+        gameOverScreen = false;
+
+        //Init Arrays
+        for (int i = 0; i < colorPickers.length; i++) {
+            colorPickers[i] = new FillColor();
+            colorPickers[i].color = FillColor.getDefaultColors()[i];
+            colorPickers[i].letter = game.pickerLetters[i];
+        }
+        for (int i = 0; i < pipes.length; i++) {
+            FillColor[] fillLevels = generateRandomFillColorArray();
+            pipes[i] = new Pipe(game.pipeLetters[i], fillLevels);
+        }
     }
 
     private static void settings() {

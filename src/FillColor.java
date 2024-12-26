@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class FillColor {
     //Class Variables
-    private static Color[] defaultColors = new Color[]{Palette.RED, Palette.GREEN, Palette.BLUE, Palette.ORANGE};
+    private static final Color[] defaultColors = new Color[]{Palette.RED, Palette.GREEN, Palette.BLUE, Palette.ORANGE};
 
     //Object Variables
     char letter;
