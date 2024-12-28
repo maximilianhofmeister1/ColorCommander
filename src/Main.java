@@ -83,7 +83,7 @@ public class Main {
     private static void buildGameInterface(double currentSpeed, int time) {
         window.clear();
         //Menu
-        window.setTitle("Multitasking Test");
+        window.setTitle("ColorCommander - Game");
         window.setColor(Palette.BLACK);
         window.drawText(10, 10, "Restart");
         window.drawText(300, 10, "current Speed: " + currentSpeed);

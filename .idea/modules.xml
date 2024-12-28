@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MultitaskingTest.iml" filepath="$PROJECT_DIR$/MultitaskingTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ColorCommander.iml" filepath="$PROJECT_DIR$/ColorCommander.iml" />
     </modules>
   </component>
 </project>
