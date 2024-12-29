@@ -22,13 +22,14 @@ public class Main {
     public static void main(String[] args) {
         restart();
         buildGameInterface(game.speed, game.time);
-
         char[] keysPressed = new char[2];
+        //KeyVisualiser.main(args);
 
         while (!window.isClosed()) {
             for (var e : window.getEventScanner()) {
                 switch (e) {
                     case KeyDownEvent a -> {
+                        //KeyVisualiser.update(Character.toUpperCase(a.getChar()));
                         if (a.getKey() == Key.SPACE) {
                             keysPressed = new char[2];
                         } else if (keysPressed[0] == '\u0000') {
@@ -47,7 +48,7 @@ public class Main {
                 }
             }
 
-            if(!gameOver) {
+            if (!gameOver) {
                 //Time
                 if (++timeCount >= 25) {
                     game.time++;
@@ -73,8 +74,7 @@ public class Main {
 
                 //is called 25 times per second
                 buildGameInterface(game.speed, game.time);
-            }
-            else if(gameOver && !gameOverScreen){
+            } else if (gameOver && !gameOverScreen) {
                 gameOver();
             }
         }
@@ -165,33 +165,31 @@ public class Main {
             }
         }
 
-        //Shuffle Letters if needed and reset counter
+        //Randomize Letters if needed and reset counter
         if (game.shuffleLetters) {
             if (++shuffleLettersCount >= game.shuffleLettersWhenCount) {
-                shuffleLetters(pipes);
-                shuffleLetters(colorPickers);
+                RandomizeLetters();
                 shuffleLettersCount = 0;
                 game.shuffleLettersWhenCount = new Random().nextInt(2, 8);
             }
         }
     }
 
-    //TODO: Shuffle Letters im ganzen Alphabet
-    private static void shuffleLetters(Pipe[] pipes) {
-        for (int j = pipes.length - 1; j > 0; j--) {
-            int index = new Random().nextInt(j + 1);
-            char a = pipes[index].letter;
-            pipes[index].letter = pipes[j].letter;
-            pipes[j].letter = a;
+    private static void RandomizeLetters() {
+        char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+        for (Pipe value : pipes) {
+            char letter = alphabet[new Random().nextInt(alphabet.length)];
+            if (Arrays.stream(pipes).noneMatch(pipe -> pipe.letter == letter) &&
+                    Arrays.stream(colorPickers).noneMatch(colorPicker -> colorPicker.letter == letter)) {
+                value.letter = letter;
+            }
         }
-    }
-
-    private static void shuffleLetters(FillColor[] colors) {
-        for (int j = colors.length - 1; j > 0; j--) {
-            int index = new Random().nextInt(j + 1);
-            char a = colors[index].letter;
-            colors[index].letter = colors[j].letter;
-            colors[j].letter = a;
+        for (FillColor value : colorPickers) {
+            char letter = alphabet[new Random().nextInt(alphabet.length)];
+            if (Arrays.stream(pipes).noneMatch(pipe -> pipe.letter == letter) &&
+                    Arrays.stream(colorPickers).noneMatch(colorPicker -> colorPicker.letter == letter)) {
+                value.letter = letter;
+            }
         }
     }
 
@@ -199,6 +197,7 @@ public class Main {
         Color[] colors = FillColor.getDefaultColors().clone();
         FillColor[] array = new FillColor[colors.length];
         //Shuffle colors Array
+        //Set Color Order
         for (int j = colors.length - 1; j > 0; j--) {
             int index = new Random().nextInt(j + 1);
             // Simple swap
@@ -207,6 +206,7 @@ public class Main {
             colors[j] = a;
         }
 
+        //Set random fill levels
         for (int i = 0; i < array.length; i++) {
             double fillLevel = new Random().nextInt(50, 101);
             array[i] = new FillColor('A', colors[i], fillLevel);
@@ -226,7 +226,15 @@ public class Main {
 
     private static void gameOver() {
         gameOverScreen = true;
-        System.out.println("Game Over");
+
+        //Game Over Screen
+        window.setColor(Palette.RED);
+        window.setTextFormat(new TextFormat().setFontSize(50).setTextOrigin(TextOrigin.CENTER));
+        window.drawText(marginX / 2, (double) window.getHeight() / 2, "GAME");
+        window.drawText(window.getWidth() - (marginX / 2), (double) window.getHeight() / 2, "OVER");
+        window.setTextFormat(new TextFormat());
+        window.show();
+
         game.saveToFile("./GameLog.txt");
     }
 
