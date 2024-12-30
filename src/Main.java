@@ -10,11 +10,11 @@ public class Main {
     static double marginY = (int) (window.getHeight() * 0.1);
 
     static int timeCount = 0;
-    static int shuffleLettersCount = 0;
+    static int randomizeLettersCount = 0;
     static boolean gameOver = false;
     static boolean gameOverScreen = false;
 
-    static GameStats game = new GameStats();
+    static Game game = new Game();
     static FillColor[] colorPickers = new FillColor[4];
     static Pipe[] pipes = new Pipe[4];
 
@@ -166,11 +166,11 @@ public class Main {
         }
 
         //Randomize Letters if needed and reset counter
-        if (game.shuffleLetters) {
-            if (++shuffleLettersCount >= game.shuffleLettersWhenCount) {
+        if (game.randomizeLetters) {
+            if (++randomizeLettersCount >= game.randomizeLettersWhenCount) {
                 RandomizeLetters();
-                shuffleLettersCount = 0;
-                game.shuffleLettersWhenCount = new Random().nextInt(2, 8);
+                randomizeLettersCount = 0;
+                game.randomizeLettersWhenCount = new Random().nextInt(2, 8);
             }
         }
     }
@@ -235,11 +235,11 @@ public class Main {
         window.setTextFormat(new TextFormat());
         window.show();
 
-        game.saveToFile("./GameLog.txt");
+        game.saveToFile("ColorCommander_GameLog.txt");
     }
 
     private static void restart() {
-        game = new GameStats();
+        game = new Game();
         gameOver = false;
         gameOverScreen = false;
 
