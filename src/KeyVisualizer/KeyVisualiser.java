@@ -1,9 +1,11 @@
+package KeyVisualizer;
+
 import codedraw.*;
 
 import java.awt.*;
 
 public class KeyVisualiser {
-    //Basic Version of KeyVisualiser -> very simple and buggy
+    //Basic Version of KeyVisualizer.KeyVisualiser -> very simple and buggy
 
     static CodeDraw visualiser = new CodeDraw(350, 200);
     static char[] keyHistory = new char[]{' ', ' '};

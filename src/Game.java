@@ -2,15 +2,15 @@ import java.io.*;
 import java.util.Random;
 
 public class Game {
-    int time;
+    Timer timer;
     double speed;
     char[] pickerLetters;
     char[] pipeLetters;
     boolean randomizeLetters;
     int randomizeLettersWhenCount;
 
-    public Game(){
-        time = 0;
+    public Game() {
+        timer = new Timer();
         speed = 1;
         pickerLetters = new char[]{'A', 'B', 'C', 'D'};
         pipeLetters = new char[]{'E', 'F', 'G', 'H'};
@@ -18,7 +18,7 @@ public class Game {
         randomizeLettersWhenCount = new Random().nextInt(2, 8);
     }
 
-    public void saveToFile(String src){
+    public void saveToFile(String src) {
         System.out.println("GameStats saved to file: " + src);
 
         try {
@@ -34,7 +34,8 @@ public class Game {
         }
     }
 
-    public String toString(){
-        return "Game: " + "Time:" + time + "; Speed:" + speed + "; RandomizeLetters:" + randomizeLetters + ";";
+    @Override
+    public String toString() {
+        return "Game: " + "Time:" + timer.getTime() + "; Speed:" + speed + "; RandomizeLetters:" + randomizeLetters + ";";
     }
 }
