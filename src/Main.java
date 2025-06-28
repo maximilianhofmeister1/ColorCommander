@@ -1,19 +1,13 @@
 import codedraw.*;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
     static CodeDraw window = new CodeDraw(1000, 600);
     static GameBoard gameBoard = new GameBoard(window);
-
-    static int timeCount = 0;
-    static int randomizeLettersCount = 0;
-    static boolean gameOver = false;
-    static boolean gameOverScreen = false;
-
     static Game game = new Game();
+
     static FillColor[] colorPickers = new FillColor[4];
     static Pipe[] pipes = new Pipe[4];
     static String saveUrl = "ColorCommander_GameLog.txt";
@@ -46,11 +40,11 @@ public class Main {
                 }
             }
 
-            if (!gameOver) {
+            if (!game.gameOver) {
                 //Time
-                if (++timeCount >= 25) {
+                if (++game.timeCount >= 25) {
                     game.timer.tick();
-                    timeCount = 0;
+                    game.timeCount = 0;
 
                     //adjust speed
                     if (game.timer.getTime() % 30 == 0 && game.speed < 5) {
@@ -62,9 +56,9 @@ public class Main {
                 for (Pipe pipe : pipes) {
                     for (FillLevel fillLevel : pipe.fillLevels) {
                         if (fillLevel.isEmpty()) {
-                            gameOver = true;
+                            game.gameOver = true;
                             break;
-                        } else { //fillLevel.getFillLevel() - game.speed / 20 > 0
+                        } else {
                             fillLevel.reduceFillLevel(game.speed / 20);
                         }
                     }
@@ -72,8 +66,8 @@ public class Main {
 
                 //is called 25 times per second
                 gameBoard.buildGameInterface(game, pipes, colorPickers);
-            } else if (gameOver && !gameOverScreen) {
-                gameOverScreen = true;
+            } else if (game.gameOver && !game.gameOverScreen) {
+                game.gameOverScreen = true;
                 gameBoard.gameOver(game, saveUrl);
             }
         }
@@ -97,9 +91,9 @@ public class Main {
 
         //Randomize Letters if needed and reset counter
         if (game.randomizeLetters) {
-            if (++randomizeLettersCount >= game.randomizeLettersWhenCount) {
+            if (++game.randomizeLettersCount >= game.randomizeLettersWhenCount) {
                 RandomizeLetters();
-                randomizeLettersCount = 0;
+                game.randomizeLettersCount = 0;
                 game.randomizeLettersWhenCount = new Random().nextInt(2, 8);
             }
         }
@@ -134,8 +128,8 @@ public class Main {
 
     private static void restart() {
         game = new Game();
-        gameOver = false;
-        gameOverScreen = false;
+        game.gameOver = false;
+        game.gameOverScreen = false;
 
         char[] pickerLetters = new char[]{'A', 'B', 'C', 'D'};
         char[] pipeLetters = new char[]{'E', 'F', 'G', 'H'};
