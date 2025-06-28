@@ -19,6 +19,7 @@ public class GameBoard {
 
     /**
      * Builds the current Game Interface with the given values
+     *
      * @param game
      * @param pipes
      * @param colorPickers
@@ -38,6 +39,7 @@ public class GameBoard {
 
     /**
      * Shows the gameOver Screen on the current Gameboard
+     *
      * @param game
      * @param saveUrl the local Path of the File, where the GameStats should be saved
      */
@@ -53,7 +55,7 @@ public class GameBoard {
         game.saveToFile(saveUrl);
     }
 
-    private void drawMenu(Game game){
+    private void drawMenu(Game game) {
         double currentSpeed = game.speed;
 
         //Menu
@@ -65,7 +67,7 @@ public class GameBoard {
         window.drawText(window.getWidth() - 80, 10, "Settings");
     }
 
-    private void drawColorPickers(FillColor[] colorPickers){
+    private void drawColorPickers(FillColor[] colorPickers) {
         for (int i = 0; i < colorPickers.length; i++) {
             window.setColor(colorPickers[i].color);
             window.fillSquare(
@@ -83,7 +85,7 @@ public class GameBoard {
         }
     }
 
-    private void drawPipes(Pipe[] pipes){
+    private void drawPipes(Pipe[] pipes) {
         //Pipes
         double pipeHeight = gameHeight - (2 * colWidth);
         for (int i = 0; i < pipes.length; i++) {
@@ -103,15 +105,15 @@ public class GameBoard {
 
             //Pipe Fill Levels
             for (int fillCount = 0; fillCount < pipes[i].fillLevels.length; fillCount++) {
-                FillColor currentFillLevel = pipes[i].fillLevels[fillCount];
+                FillLevel currentFillLevel = pipes[i].fillLevels[fillCount];
                 double fillWidth = colWidth / pipes[i].fillLevels.length;
-                double fillHeight = pipeHeight / 100 * currentFillLevel.fillLevel;
+                double fillHeight = pipeHeight / 100 * currentFillLevel.getFillLevel();
                 Point2D fillsXYCoordinate = new Point2D(
                         (colWidth * 1.5 * i) + marginX + (fillWidth * fillCount),
                         marginY + (2 * colWidth) + pipeHeight
                 );
-                window.setColor(currentFillLevel.color);
-                window.fillRectangle(fillsXYCoordinate.getX(), fillsXYCoordinate.getY() - fillHeight, fillWidth, fillHeight);
+                window.setColor(currentFillLevel.getColor().color);
+                window.fillRectangle(fillsXYCoordinate.getX(), fillsXYCoordinate.getY() - fillHeight, fillWidth, (fillHeight > 0) ? fillHeight : 0);
             }
         }
     }

@@ -60,12 +60,12 @@ public class Main {
 
                 //adjust fill levels
                 for (Pipe pipe : pipes) {
-                    for (FillColor fillLevel : pipe.fillLevels) {
-                        if (fillLevel.fillLevel - game.speed / 20 > 0) {
-                            fillLevel.fillLevel -= game.speed / 20;
-                        } else {
+                    for (FillLevel fillLevel : pipe.fillLevels) {
+                        if (fillLevel.isEmpty()) {
                             gameOver = true;
                             break;
+                        } else { //fillLevel.getFillLevel() - game.speed / 20 > 0
+                            fillLevel.reduceFillLevel(game.speed / 20);
                         }
                     }
                 }
@@ -81,21 +81,17 @@ public class Main {
 
 
     private static void fillUp(char[] keysPressed) {
-        Color c = null;
+        FillColor c = null;
         for (FillColor colorPicker : colorPickers) {
             if (keysPressed[0] == colorPicker.letter) {
-                c = colorPicker.color;
+                c = colorPicker;
                 break;
             }
         }
+        //Refill FillLevel of Pipe
         for (Pipe pipe : pipes) {
             if (keysPressed[1] == pipe.letter) {
-                for (FillColor fc : pipe.fillLevels) {
-                    if (c == fc.color) {
-                        fc.fillLevel = 100;
-                        break;
-                    }
-                }
+                pipe.refillFillLevel(c);
             }
         }
 
@@ -127,28 +123,6 @@ public class Main {
         }
     }
 
-    private static FillColor[] generateRandomFillColorArray() {
-        Color[] colors = FillColor.getDefaultColors().clone();
-        FillColor[] array = new FillColor[colors.length];
-        //Shuffle colors Array
-        //Set Color Order
-        for (int j = colors.length - 1; j > 0; j--) {
-            int index = new Random().nextInt(j + 1);
-            // Simple swap
-            Color a = colors[index];
-            colors[index] = colors[j];
-            colors[j] = a;
-        }
-
-        //Set random fill levels
-        for (int i = 0; i < array.length; i++) {
-            double fillLevel = new Random().nextInt(50, 101);
-            array[i] = new FillColor('A', colors[i], fillLevel);
-        }
-
-        return array;
-    }
-
     //selects correct function (restart() or settings())
     private static void checkWindowClick(int x, int y) {
         if (x < 100 && y < 40) {
@@ -163,16 +137,21 @@ public class Main {
         gameOver = false;
         gameOverScreen = false;
 
+        char[] pickerLetters = new char[]{'A', 'B', 'C', 'D'};
+        char[] pipeLetters = new char[]{'E', 'F', 'G', 'H'};
+
         //Init Arrays
         for (int i = 0; i < colorPickers.length; i++) {
-            colorPickers[i] = new FillColor();
-            colorPickers[i].color = FillColor.getDefaultColors()[i];
-            colorPickers[i].letter = game.pickerLetters[i];
+            colorPickers[i] = new FillColor(
+                    pickerLetters[i],
+                    FillColor.getDefaultColors()[i]
+            );
         }
         for (int i = 0; i < pipes.length; i++) {
-            FillColor[] fillLevels = generateRandomFillColorArray();
-            pipes[i] = new Pipe(game.pipeLetters[i], fillLevels);
+            FillLevel[] fillLevels = FillLevel.GenerateRandomFillLevelsArray(colorPickers);
+            pipes[i] = new Pipe(pipeLetters[i], fillLevels);
         }
+        RandomizeLetters();
     }
 
     private static void settings() {
