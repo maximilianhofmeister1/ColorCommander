@@ -4,17 +4,58 @@ public class GameBoard {
     private final CodeDraw window;
     private final int marginX;
     private final int marginY;
+    private final double gameWidth;
+    private final double gameHeight;
+    private final double colWidth;
 
     public GameBoard(CodeDraw window) {
         this.window = window;
         this.marginX = (int) (window.getWidth() * 0.2);
         this.marginY = (int) (window.getHeight() * 0.1);
+        this.gameWidth = window.getWidth() - (2 * marginX);
+        this.gameHeight = window.getHeight() - (2 * marginY);
+        this.colWidth = gameWidth / 5.5;
     }
 
+    /**
+     * Builds the current Game Interface with the given values
+     * @param game
+     * @param pipes
+     * @param colorPickers
+     */
     public void buildGameInterface(Game game, Pipe[] pipes, FillColor[] colorPickers) {
+        window.clear();
+
+        //Menu
+        drawMenu(game);
+        //ColorPickers
+        drawColorPickers(colorPickers);
+        //Pipes
+        drawPipes(pipes);
+
+        window.show(40);
+    }
+
+    /**
+     * Shows the gameOver Screen on the current Gameboard
+     * @param game
+     * @param saveUrl the local Path of the File, where the GameStats should be saved
+     */
+    public void gameOver(Game game, String saveUrl) {
+        //Game Over Screen
+        window.setColor(Palette.RED);
+        window.setTextFormat(new TextFormat().setFontSize(50).setTextOrigin(TextOrigin.CENTER));
+        window.drawText(marginX / 2, (double) window.getHeight() / 2, "GAME");
+        window.drawText(window.getWidth() - (marginX / 2), (double) window.getHeight() / 2, "OVER");
+        window.setTextFormat(new TextFormat());
+        window.show();
+
+        game.saveToFile(saveUrl);
+    }
+
+    private void drawMenu(Game game){
         double currentSpeed = game.speed;
 
-        window.clear();
         //Menu
         window.setTitle("ColorCommander - Game");
         window.setColor(Palette.BLACK);
@@ -22,13 +63,9 @@ public class GameBoard {
         window.drawText(300, 10, "current Speed: " + currentSpeed);
         window.drawText(600, 10, "Time: " + game.timer.toString());
         window.drawText(window.getWidth() - 80, 10, "Settings");
+    }
 
-        //Game
-        double gameWidth = window.getWidth() - (2 * marginX);
-        double gameHeight = window.getHeight() - (2 * marginY);
-        double colWidth = gameWidth / 5.5;
-
-        //ColorPickers
+    private void drawColorPickers(FillColor[] colorPickers){
         for (int i = 0; i < colorPickers.length; i++) {
             window.setColor(colorPickers[i].color);
             window.fillSquare(
@@ -44,7 +81,9 @@ public class GameBoard {
                     "" + colorPickers[i].letter
             );
         }
+    }
 
+    private void drawPipes(Pipe[] pipes){
         //Pipes
         double pipeHeight = gameHeight - (2 * colWidth);
         for (int i = 0; i < pipes.length; i++) {
@@ -75,19 +114,5 @@ public class GameBoard {
                 window.fillRectangle(fillsXYCoordinate.getX(), fillsXYCoordinate.getY() - fillHeight, fillWidth, fillHeight);
             }
         }
-
-        window.show(40);
-    }
-
-    public void gameOver(Game game, String saveUrl) {
-        //Game Over Screen
-        window.setColor(Palette.RED);
-        window.setTextFormat(new TextFormat().setFontSize(50).setTextOrigin(TextOrigin.CENTER));
-        window.drawText(marginX / 2, (double) window.getHeight() / 2, "GAME");
-        window.drawText(window.getWidth() - (marginX / 2), (double) window.getHeight() / 2, "OVER");
-        window.setTextFormat(new TextFormat());
-        window.show();
-
-        game.saveToFile(saveUrl);
     }
 }
